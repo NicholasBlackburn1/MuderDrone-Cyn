@@ -5,6 +5,7 @@ def parse_chat_log(input_file, output_file):
     Parses ChatGPT-style logs into JSON training data.
     Handles unhandled lines by treating them as user input.
     Replaces instances of "content removed" with "N/A."
+    Removes single string entries like "2/2" that might affect input processing.
 
     Args:
         input_file (str): Path to the chat log file.
@@ -20,6 +21,7 @@ def parse_chat_log(input_file, output_file):
     total_bot_responses = 0
     skipped_lines = 0
     placeholder_added = 0
+    skipped_strings = []
 
     try:
         # Open and read the file, removing blank lines and trimming whitespace
@@ -32,6 +34,13 @@ def parse_chat_log(input_file, output_file):
             # Replace instances of "content removed" with "N/A"
             if "content removed" in line.lower():
                 line = "N/A"
+
+            # Skip lines that are single strings like "2/2"
+            if len(line.split()) == 1 and "/" in line:
+                print(f"[INFO] Line {i}: Skipping single string line: {line}")
+                skipped_lines += 1
+                skipped_strings.append((i, line, lines[i + 1] if i + 1 < len(lines) else "N/A"))
+                continue
 
             if line.startswith("You said:"):
                 total_user_inputs += 1  # Count user inputs
@@ -110,8 +119,12 @@ def parse_chat_log(input_file, output_file):
         print(f"Total user-bot pairs: {len(training_data)}")
         print(f"Total user inputs: {total_user_inputs}")
         print(f"Total bot responses: {total_bot_responses}")
-        print(f"Skipped lines: {skipped_lines}")
-        print(f"Placeholders added: {placeholder_added}")
+        print(f"Skipped single-string lines: {skipped_lines}")
+
+        if skipped_strings:
+            print("[INFO] Skipped lines with potential related inputs:")
+            for index, skipped, next_line in skipped_strings:
+                print(f"  Line {index}: Skipped '{skipped}' -> Next line: '{next_line}'")
 
     except FileNotFoundError:
         print(f"[ERROR] Input file not found: {input_file}")
