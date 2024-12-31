@@ -5,6 +5,8 @@
 
 **Note: make sure u vopy up into the last output and remove any data that doesnt pertan to the meaasge u want to be added**
 
+**Nother Note: any input data gets dumped into the pretraining.txt file**
+
 copy chatgp output to look like this 
 
 ``` 
