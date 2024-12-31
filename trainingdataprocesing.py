@@ -4,6 +4,7 @@ def parse_chat_log(input_file, output_file):
     """
     Parses ChatGPT-style logs into JSON training data.
     Handles unhandled lines by treating them as user input.
+    Replaces instances of "content removed" with "N/A."
 
     Args:
         input_file (str): Path to the chat log file.
@@ -28,13 +29,17 @@ def parse_chat_log(input_file, output_file):
         print(f"Total lines after removing blanks: {len(lines)}")
 
         for i, line in enumerate(lines):
+            # Replace instances of "content removed" with "N/A"
+            if "content removed" in line.lower():
+                line = "N/A"
+
             if line.startswith("You said:"):
                 total_user_inputs += 1  # Count user inputs
 
                 # Save the previous pair before starting a new one
                 if current_user_input and current_bot_response:
                     training_data.append({
-                        "user_input": current_user_input,
+                        "user_input": "N/A" if "content removed" in current_user_input.lower() else current_user_input,
                         "response": "\n".join(current_bot_response)
                     })
                     current_bot_response = []  # Reset bot response
@@ -73,7 +78,7 @@ def parse_chat_log(input_file, output_file):
                 if current_user_input and current_bot_response:
                     # Save current pair before starting a new one
                     training_data.append({
-                        "user_input": current_user_input,
+                        "user_input": "N/A" if "content removed" in current_user_input.lower() else current_user_input,
                         "response": "\n".join(current_bot_response)
                     })
                     current_bot_response = []  # Reset bot response
@@ -86,13 +91,13 @@ def parse_chat_log(input_file, output_file):
         # Save the last user-bot pair, if any
         if current_user_input and current_bot_response:
             training_data.append({
-                "user_input": current_user_input,
+                "user_input": "N/A" if "content removed" in current_user_input.lower() else current_user_input,
                 "response": "\n".join(current_bot_response)
             })
         elif current_user_input and not current_bot_response:
             # Add placeholder for missing bot response
             training_data.append({
-                "user_input": current_user_input,
+                "user_input": "N/A" if "content removed" in current_user_input.lower() else current_user_input,
                 "response": "N/A"
             })
             placeholder_added += 1
