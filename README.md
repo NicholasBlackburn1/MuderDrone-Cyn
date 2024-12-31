@@ -1,4 +1,5 @@
 # MuderDrone-Cyn LLM Trainging Data
+Welcome to the MurderDrone-Cyn project, where we're bringing Cyn to life as a cutting-edge AI with personality, charm, and a bit of chaos. This repo houses the data, models, and tools necessary to create and fine-tune Cyn, powered by LLaMA and tailored to your wildest dreams.
 
 
 ## For inputing chat data:
